@@ -4,6 +4,7 @@ import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRig
 import { Link, useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { toast } from 'react-toastify';
+import OAuth from '../components/OAuth';
 const SignIn = () => {
   const navigate = useNavigate();
   // for showing the password in text or not
@@ -94,6 +95,7 @@ const SignIn = () => {
             </div>
           </form>
           {/* Google 0Auth Component  */}
+          <OAuth />
           <Link to='/sign-up' className='registerLink'>
             Sign Up Instead
           </Link>

@@ -10,6 +10,7 @@ import {
 import { db } from '../firebase.config';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import OAuth from '../components/OAuth';
 const SignUp = () => {
   const navigate = useNavigate();
   // for showing the password in text or not
@@ -61,8 +62,11 @@ const SignUp = () => {
       // after logged in we are redirecting the user to home screen
       navigate('/');
     } catch (error) {
-      toast.error('Something went wrong with registration !!!');
-      console.log(error);
+      if (error.message.includes('email-already-in-use')) {
+        toast.error('Entered email id already exist.');
+      } else {
+        toast.error('Something went wrong with registration !!!');
+      }
     }
   };
   return (
@@ -116,6 +120,7 @@ const SignUp = () => {
             </div>
           </form>
           {/* Google 0Auth Component  */}
+          <OAuth />
           <Link to='/sign-in' className='registerLink'>
             Sign In Instead
           </Link>
