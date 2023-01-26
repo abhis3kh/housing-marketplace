@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import { db } from '../firebase.config';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 const SignUp = () => {
   const navigate = useNavigate();
   // for showing the password in text or not
@@ -22,7 +23,7 @@ const SignUp = () => {
 
   // destrucing it
   const { name, email, password } = formData;
-  // defining the handler for chaning the value in the input fields
+  // defining the handler for changing the value in the input fields
   const onChangeHandle = (e) => {
     setFormData((prevState) => ({
       // returing the previous state with the changed value updated in 2nd line
@@ -54,12 +55,13 @@ const SignUp = () => {
       // then removing the password field before saving the user to DB as we don't want to expose the password
       delete formDataCopy.password;
       formDataCopy.timestamp = serverTimestamp(); //setting a timestamp when creating
-
+      console.log(formDataCopy);
       // creating the entry in DB
       await setDoc(doc(db, 'users', user.uid), formDataCopy); //this user is coming from userCrendtial.user
       // after logged in we are redirecting the user to home screen
       navigate('/');
     } catch (error) {
+      toast.error('Something went wrong with registration !!!');
       console.log(error);
     }
   };

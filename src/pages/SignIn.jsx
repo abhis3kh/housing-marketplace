@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { toast } from 'react-toastify';
 const SignIn = () => {
+  const navigate = useNavigate();
   // for showing the password in text or not
   const [showPassword, setShowPassword] = useState(false);
   // taking the form data as a whole object then destrucing it.
@@ -13,7 +16,6 @@ const SignIn = () => {
 
   // destrucing it
   const { email, password } = formData;
-  console.log(email, password);
   // defining the handler
   const onChangeHandle = (e) => {
     setFormData((prevState) => ({
@@ -22,6 +24,33 @@ const SignIn = () => {
       [e.target.id]: e.target.value,
     }));
   };
+  // signing
+  const onSubmitHandle = async (e) => {
+    e.preventDefault();
+    try {
+      // getting the auth initialized
+      const auth = getAuth();
+      const userCredentails = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredentails.user) {
+        //if it is valid user
+        navigate('/'); //navigate back to home
+      }
+    } catch (error) {
+      // if anything goes wrong
+      const errorMessage = error.message;
+      if (errorMessage.includes('auth/user-not-found')) {
+        toast.error(`User doesn't exist in the database !!!`);
+      } else if (errorMessage.includes('auth/wrong-password')) {
+        toast.error(`Entered password is incorrect !!!`);
+      } else {
+        toast.error('Something went wrong !!!');
+      }
+    }
+  };
   return (
     <>
       <div className='pageContainer'>
@@ -29,7 +58,7 @@ const SignIn = () => {
           <p className='pageHeader'>Welcome !!!</p>
         </header>
         <main>
-          <form>
+          <form onSubmit={onSubmitHandle}>
             <input
               type='email'
               className='emailInput'
