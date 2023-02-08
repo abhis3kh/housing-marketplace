@@ -64,7 +64,12 @@ const Category = () => {
             <ul className='categoryListings'>
               {listing.map((item) => {
                 return (
-                  <ListingItem listing={item.data} id={item.id} key={item.id} />
+                  <ListingItem
+                    listing={item.data}
+                    id={item.id}
+                    key={item.id}
+                    onDelete='sasd'
+                  />
                 );
               })}
             </ul>
