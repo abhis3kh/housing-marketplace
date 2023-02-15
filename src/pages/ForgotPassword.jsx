@@ -16,7 +16,9 @@ const ForgotPassword = () => {
       const auth = getAuth();
       // send the request to firebase for reset
       await sendPasswordResetEmail(auth, email);
-      toast.success('Email was sent for password reset.');
+      toast.success(
+        'Email was sucessfully sent for password reset in your email address.'
+      );
     } catch (error) {
       toast.error(`Coludn't send reset email`);
     }

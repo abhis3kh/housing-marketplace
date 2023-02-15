@@ -89,7 +89,7 @@ const EditListing = () => {
     setLoading(true);
     if (discountedPrice >= regularPrice) {
       setLoading(false);
-      toast.error('Discounted should be lesser than Regular Price.');
+      toast.error(`Discounted can't be lesser than Regular Price.`);
     }
     // if more than 6 images are uploaded
     if (images.length > 6) {
@@ -100,7 +100,7 @@ const EditListing = () => {
     let geoLocation = {};
     let location;
     if (geolocationEnabled) {
-      //do something
+      // fetching the lat and lng from the address given using geoCodeEncoding
       const reponse = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_MAPS_API}`
       );
@@ -115,7 +115,6 @@ const EditListing = () => {
         setLoading(false);
         toast.error('Please Enter a Valid Address');
       }
-      console.log(geoLocation, location);
     } else {
       // if user doesn't want to track
       geoLocation.lat = latitude;
@@ -149,6 +148,7 @@ const EditListing = () => {
                 break;
               default:
                 console.log('Do Nothing');
+                break;
             }
           },
           (error) => {
@@ -173,15 +173,13 @@ const EditListing = () => {
       toast.error('Images not uploaded.');
       return;
     });
-    console.log(imgUrls);
-
     const formDataCopy = {
       ...formData,
       imgUrls,
       geoLocation,
       timestamp: serverTimestamp(),
     };
-    // delete images from data
+    // delete images from data as we already have the ImgUrls where got urls of the images we have uploaded
     delete formDataCopy.images;
     delete formDataCopy.address;
     // if location variables contains valid data
@@ -235,6 +233,7 @@ const EditListing = () => {
 
   useEffect(() => {
     if (listing && listing.userRef !== auth.currentUser.uid) {
+      // redirect if listing is not current logged in user's listing
       navigate('/');
       toast.error("You don't have permission to edit this listing");
     }
@@ -242,8 +241,6 @@ const EditListing = () => {
   if (loading) {
     return <Spinner />;
   }
-
-  // redirect if listing is not current logged in user's listing
 
   return (
     <div className='profile'>

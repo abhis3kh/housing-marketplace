@@ -13,13 +13,12 @@ const Contact = () => {
   const params = useParams();
   useEffect(() => {
     const getLandLordDetail = async () => {
-      console.log(params.landlordId);
+      // getting details of the user
       const docRef = doc(db, 'users', params.landlordId);
       const landlordSnap = await getDoc(docRef);
       if (landlordSnap.exists()) {
-        // setting the value to state so I can access outside of useEffect
+        // setting the value to state variable so I can access outside of useEffect
         setLanlord(landlordSnap.data());
-        console.log(landlordSnap.data());
       } else {
         toast.error('Something went wrong');
       }

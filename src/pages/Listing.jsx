@@ -46,7 +46,7 @@ const Listing = () => {
   }
   return (
     <main>
-      {/* Slide show */}
+      {/* Slide show of the images of the current property */}
       <Swiper
         modules={[Navigation, Pagination, Scrollbar, A11y]}
         slidesPerView={1}
@@ -71,9 +71,11 @@ const Listing = () => {
       <div
         className='shareIconDiv'
         onClick={() => {
+          // for coping the link of the current URL to the clipboard of the user
           navigator.clipboard.writeText(window.location.href);
           setShareLinkCopied(true);
           setTimeout(() => {
+            // this will disable the copied link pop up after some time
             setShareLinkCopied(false);
           }, 1000);
         }}
@@ -98,7 +100,10 @@ const Listing = () => {
         </p>
         {listing.offer && (
           <p className='discountPrice'>
-            {listing.regularPrice - listing.discountedPrice}
+            ₹{' '}
+            {(listing.regularPrice - listing.discountedPrice)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
             Saved
           </p>
         )}
@@ -117,7 +122,7 @@ const Listing = () => {
           <li>{listing.furnished ? 'Furnished' : 'Not Furnished'}</li>
         </ul>
         <p className='listingLocationTitle'>Location</p>
-        {/* Map */}
+        {/* For showing the Map - Used Leaflet Libary for doing this */}
         <div className='leafletContainer'>
           <MapContainer
             style={{ height: '100%', width: '100%' }}
@@ -135,6 +140,7 @@ const Listing = () => {
           </MapContainer>
         </div>
         {auth.currentUser?.uid !== listing.userRef && (
+          // redirecting user to the page where they can send a mail to listing creator
           <Link
             to={`/contact/${listing.userRef}?listingName=${listing.name}`}
             className='primaryButton'

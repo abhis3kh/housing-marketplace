@@ -47,7 +47,7 @@ const SignUp = () => {
       const user = UserCredential.user;
       // setting the details to the profile after creating
       // to get current Created user use : auth.currentUser
-      // updating the profile
+      // !updating the profile
       updateProfile(auth.currentUser, {
         displayName: name, //this name we are taking from user & is a state variable
       });
@@ -56,7 +56,6 @@ const SignUp = () => {
       // then removing the password field before saving the user to DB as we don't want to expose the password
       delete formDataCopy.password;
       formDataCopy.timestamp = serverTimestamp(); //setting a timestamp when creating
-      console.log(formDataCopy);
       // creating the entry in DB
       await setDoc(doc(db, 'users', user.uid), formDataCopy); //this user is coming from userCrendtial.user
       // after logged in we are redirecting the user to home screen
@@ -88,7 +87,7 @@ const SignUp = () => {
             <input
               type='text'
               className='nameInput'
-              placeholder='Enter Name'
+              placeholder='Enter name'
               id='name'
               value={name}
               onChange={onChangeHandle}
@@ -97,7 +96,7 @@ const SignUp = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 className='passwordInput'
-                placeholder='Enter the password'
+                placeholder='Enter password'
                 id='password'
                 value={password}
                 onChange={onChangeHandle}

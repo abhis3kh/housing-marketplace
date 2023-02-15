@@ -48,7 +48,9 @@ const SignIn = () => {
       } else if (errorMessage.includes('auth/wrong-password')) {
         toast.error(`Entered password is incorrect !!!`);
       } else {
-        toast.error('Something went wrong !!!');
+        toast.error(
+          'Something went wrong !!! Try again with different email address.'
+        );
       }
     }
   };
@@ -72,7 +74,7 @@ const SignIn = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 className='passwordInput'
-                placeholder='Enter the password'
+                placeholder='Enter password'
                 id='password'
                 value={password}
                 onChange={onChangeHandle}
@@ -81,6 +83,7 @@ const SignIn = () => {
                 src={visibilityIcon}
                 alt='show password'
                 className='showPassword'
+                // reversing the whatever current stage of the password is. showPassword variable dicates what type of input password is : text or Password
                 onClick={() => setShowPassword((prevState) => !prevState)}
               />
             </div>

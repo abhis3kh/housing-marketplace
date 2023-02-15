@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
 import ListingItem from '../components/ListingItem';
 const Category = () => {
+  // initialize the stateVariables
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastFetchedListing, setLastFetchedListing] = useState(null);
@@ -30,7 +31,7 @@ const Category = () => {
     const count = snapshot.data().count;
     setCount(count);
   };
-  //   initialize the params
+  //   initialize the params to get listingId from Url
   const params = useParams();
   useEffect(() => {
     const fetchListing = async () => {
@@ -40,7 +41,7 @@ const Category = () => {
         // create a query
         const q = query(
           listingsRef,
-          where('type', '==', params.categoryName), //getting all the listing for request params means rent/sell
+          where('type', '==', params.categoryName), // getting all the listing for request params either :  rent/sell
           orderBy('timestamp', 'desc'), //ordering the data by timeStamp in decendening order.
           limit(10) //only give 10 per request
         );
@@ -48,6 +49,7 @@ const Category = () => {
         const querySnap = await getDocs(q);
         // getting last item
         const lastVisible = querySnap.docs[querySnap.docs.length - 1];
+        // setting the last item to an state Variable, so we can use it as a reference when getting the next set of values
         setLastFetchedListing(lastVisible);
         const listings = [];
         querySnap.forEach((doc) => {
@@ -60,6 +62,8 @@ const Category = () => {
         setListing(listings);
         //make the loading dispear as we get the data
         setLoading(false);
+        // getCount
+        getCount();
       } catch (error) {
         toast.error(`Couldn't fetch the listings`);
       }
@@ -114,16 +118,12 @@ const Category = () => {
             <ul className='categoryListings'>
               {listing.map((item) => {
                 return (
-                  <ListingItem
-                    listing={item.data}
-                    id={item.id}
-                    key={item.id}
-                    onDelete='sasd'
-                  />
+                  <ListingItem listing={item.data} id={item.id} key={item.id} />
                 );
               })}
             </ul>
           </main>
+          {/* If the count of the total document is less than the current listing size then only we will show the load more data */}
           {lastFetchedListing && listing.length < count && (
             <p className='loadMore' onClick={onLoadMorefetchListing}>
               Load More

@@ -11,28 +11,31 @@ const OAuth = () => {
   const onGoogleClick = async (e) => {
     try {
       const auth = getAuth();
+      // initializing the provider as it will be used a paramter to get signInPopUp
       const provider = new GoogleAuthProvider();
+      // Popping up the sign window and getting the detail of user
       const result = await signInWithPopup(auth, provider);
+      // getting the user data
       const user = result.user;
-      //   checking if the user already exist,if not will add that to the database.
+      //  ! checking if the user already exist,if yes then not will add that to the database.
       const docRef = doc(db, 'users', user.uid);
       const docSnap = await getDoc(docRef);
-      //   If the user doesn't exist
+      //   If the user doesn't exist, we will create a new user
       if (!docSnap.exists()) {
-        //it is not present in DB, so we will create it.
         await setDoc(doc(db, 'users', user.uid), {
           //data we want save for that user
           name: user.displayName,
           email: user.email,
           timestamp: serverTimestamp(),
         });
-        navigate('/');
+        navigate('/'); //redirecting him to home page after success
       }
+      //if the user already exist then we will do nothing, we will also redirect him to home page
+      navigate('/');
     } catch (error) {
       toast.error(
-        'Unable to login using Google sign in. Please try other methods.'
+        'Unable to login using Google sign in. Please try other log in methods.'
       );
-      console.log(error.message);
     }
   };
   return (

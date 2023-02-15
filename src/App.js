@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import Explore from './pages/Explore';
@@ -9,8 +11,6 @@ import Offer from './pages/Offer';
 import Profile from './pages/Profile';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import CreateListing from './pages/CreateListing';
 import Listing from './pages/Listing';
 import Contact from './pages/Contact';
@@ -23,7 +23,7 @@ const App = () => {
           <Route path='/' element={<Explore />} />
           <Route path='/offer' element={<Offer />} />
           <Route path='/category/:categoryName' element={<Category />} />
-          {/* for protected route */}
+          {/* Protected route : Profile Page */}
           <Route path='/profile' element={<PrivateRoute />}>
             <Route path='/profile' element={<Profile />} />
           </Route>

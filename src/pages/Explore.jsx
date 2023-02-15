@@ -8,7 +8,7 @@ const Explore = () => {
     <div className='explore'>
       <header className='pageHeader'>Explore</header>
       <main>
-        {/* Slider */}
+        {/* Slider Compoent to show the different items on the home screen*/}
         <Slider />
         <p className='exploreCategoryHeading'>Categories</p>
         <div className='exploreCategories'>

@@ -19,6 +19,7 @@ import arrowRight from '../assets/svg/keyboardArrowRightIcon.svg';
 import homeIcon from '../assets/svg/homeIcon.svg';
 
 const Profile = () => {
+  // initialize the hooks
   const auth = getAuth();
   const [changeDetails, setChangeDetails] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const Profile = () => {
   const [listing, setListing] = useState(null);
 
   useEffect(() => {
+    // getting the current logged in user's listing details
     const fetchUserListing = async () => {
       const listingRef = collection(db, 'listings');
       const q = query(
@@ -37,13 +39,13 @@ const Profile = () => {
 
       const listing = [];
       qSnap.forEach((doc) => {
+        // getting the required information for each listing
         return listing.push({
           id: doc.id,
           data: doc.data(),
         });
       });
       setListing(listing);
-      console.log(listing);
       setLoading(false);
     };
     fetchUserListing();
@@ -87,7 +89,7 @@ const Profile = () => {
   };
   // for deleting a item from the page
   const onDelete = async (id, name) => {
-    console.log(`Request for Deleting the product : ${id} recieved. `);
+    // console.log(`Request for Deleting the product : ${id} recieved. `);
     if (window.confirm(`Are you sure that you want to delete ${name} ?`)) {
       await deleteDoc(doc(db, 'listings', id));
       //now updating the local data which we have to reflect the changes in UI
@@ -99,8 +101,7 @@ const Profile = () => {
     }
   };
 
-  // For editing an item
-
+  // For editing an item : we will redirect the user to an personal editing page for that listing.
   const onEdit = (listingId) => navigate(`/edit-listing/${listingId}`);
 
   return (
@@ -131,7 +132,7 @@ const Profile = () => {
               type='text'
               id='name'
               className={!changeDetails ? 'profileName' : 'profileNameActive'}
-              disabled={!changeDetails} //only enable when we are in write stage
+              disabled={!changeDetails} //only enable when we are in write stage as change details by default set to false which will disabled writing when not in editing mode
               onChange={onChange}
               // eslint-disable-next-line no-restricted-globals
               value={name}

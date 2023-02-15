@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
 const CreateListing = () => {
+  // eslint-disable-next-line
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ const CreateListing = () => {
     latitude,
     longitude,
   } = formData;
-  // initialize auth
+  // initialize hooks
   const auth = getAuth();
   const navigate = useNavigate();
   const isMounted = useRef(true);
@@ -61,7 +62,7 @@ const CreateListing = () => {
     if (e.target.value === 'false') {
       boolean = false;
     }
-    // files
+    // files & setting other details we have captured from the user.
     if (e.target.files) {
       //is an array of images
       setFormData((prevState) => ({
@@ -96,13 +97,15 @@ const CreateListing = () => {
     let geoLocation = {};
     let location;
     if (geolocationEnabled) {
-      //do something
+      //getting the geoLocation based on the given address
       const reponse = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_MAPS_API}`
       );
       const data = await reponse.json();
+      // cature details from the response
       geoLocation.lat = data.results[0]?.geometry.location.lat;
       geoLocation.lng = data.results[0]?.geometry.location.lng;
+      // doing filternation on address/location
       location =
         data.status === 'ZERO_RESULTS'
           ? undefined
@@ -111,7 +114,6 @@ const CreateListing = () => {
         setLoading(false);
         toast.error('Please Enter a Valid Address');
       }
-      console.log(geoLocation, location);
     } else {
       // if user doesn't want to track
       geoLocation.lat = latitude;
@@ -127,7 +129,7 @@ const CreateListing = () => {
         const storageRef = ref(storage, `images/${filename}`);
         const uploadTask = uploadBytesResumable(storageRef, image);
 
-        // uploadOn
+        // uploadOn => this will showcase in terminal how much percentage of the images are upladed
         uploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -143,6 +145,8 @@ const CreateListing = () => {
               case 'running':
                 console.log('Upload is running');
                 break;
+              default:
+                break;
             }
           },
           (error) => {
@@ -152,6 +156,7 @@ const CreateListing = () => {
             // Handle successful uploads on complete
             // For instance, get the download URL: https://firebasestorage.googleapis.com/...
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              // this will give the URL of the images which are uploaded on the storage
               return resolve(downloadURL);
             });
           }
@@ -160,6 +165,7 @@ const CreateListing = () => {
     };
     const imgUrls = await Promise.all(
       [...images].map((img) => {
+        // calling this so we get URLs for all the images we have uploaded
         return storeImage(img);
       })
     ).catch(() => {
@@ -167,8 +173,6 @@ const CreateListing = () => {
       toast.error('Images not uploaded.');
       return;
     });
-    console.log(imgUrls);
-
     const formDataCopy = {
       ...formData,
       imgUrls,
@@ -180,12 +184,12 @@ const CreateListing = () => {
     delete formDataCopy.address;
     // if location variables contains valid data
     location && (formDataCopy.location = location);
-    //if there is no offer, will delete the discounted price
+    //if there is no offer, will delete the discounted price column
     !formDataCopy.offer && delete formDataCopy.discountedPrice;
-    console.log(formDataCopy);
     const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
     setLoading(false);
-    toast.success('Your house is now sucessfully listed.');
+    toast.success(`Your house : ${formData.name} sucessfully listed.`);
+    // after creating we are redirecting user to the personal page of their listing
     navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   };
   // check

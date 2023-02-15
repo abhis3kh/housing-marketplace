@@ -29,7 +29,6 @@ const Offer = () => {
   const [loading, setLoading] = useState(true);
   const [lastFetchedListing, setLastFetchedListing] = useState(null);
   const [count, setCount] = useState(0);
-  //   initialize the params
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -74,7 +73,7 @@ const Offer = () => {
       // create a query
       const q = query(
         listingsRef,
-        where('offer', '==', true), //getting all the listing for request params means rent/sell
+        where('offer', '==', true), //getting all the listing for request params which was visited i.e rent/sell
         orderBy('timestamp', 'desc'), //ordering the data by timeStamp in decendening order.
         // to get the item after previous items
         startAfter(lastFetchedListing),
@@ -109,12 +108,7 @@ const Offer = () => {
             <ul className='categoryListings'>
               {listing.map((item) => {
                 return (
-                  <ListingItem
-                    listing={item.data}
-                    id={item.id}
-                    key={item.id}
-                    onDelete='sasd'
-                  />
+                  <ListingItem listing={item.data} id={item.id} key={item.id} />
                 );
               })}
             </ul>
@@ -123,14 +117,16 @@ const Offer = () => {
           {/* Add a feature to show load only when it something to show otherwise don't show */}
           <br />
           <br />
-          {lastFetchedListing && listing.length < count && (
+          {lastFetchedListing && listing.length <= count && (
             <p className='loadMore' onClick={onLoadMorefetchListing}>
               Load More
             </p>
           )}
         </>
       ) : (
-        <p>There are no current offer going on.</p>
+        <p>
+          There are no offer currently going on. Come back again after sometime.{' '}
+        </p>
       )}
     </div>
   );

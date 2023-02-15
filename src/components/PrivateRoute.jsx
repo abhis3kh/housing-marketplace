@@ -6,10 +6,10 @@ import Spinner from './Spinner';
 const PrivateRoute = () => {
   const { loggedIn, checkingStatus } = useAuthStatus();
   if (checkingStatus) {
-    //if it is in progress to check the logging in status
+    //if it is in progress to check the logging in status, then show a spinner
     return <Spinner />;
   }
-  //else we will return this : if logged in we will return the child element which embedded in App component. If not, we will redirect it to sign-in page.
+  //else we will return this : if logged in we will return the child element which <Profile> Page which embedded in App component. If not, we will redirect it to sign-in page. in this manner, Profile only given if the loggedIn is true
   return loggedIn ? <Outlet /> : <Navigate to='/sign-in' />;
 };
 
