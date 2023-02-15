@@ -1,8 +1,8 @@
-# House Marketplace
+# House Marketplace - One Stop Solution for selling and renting house/s.
 
 Find and list houses for sale or for rent. This is a React Application Build with the help of Firebase 9.
 
-## Features used
+## Features Implemented
 
 1. Log in with email & Password.
 
