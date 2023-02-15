@@ -7,8 +7,11 @@ import {
   where,
   orderBy,
   limit,
-  //   startAfter,
+  startAfter,
   query,
+  getFirestore,
+  collectionGroup,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
@@ -17,6 +20,16 @@ import ListingItem from '../components/ListingItem';
 const Category = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastFetchedListing, setLastFetchedListing] = useState(null);
+  const [count, setCount] = useState(0);
+  // counting the document numbers in the collection to show loading button dynamically
+  const getCount = async () => {
+    const firestore = getFirestore();
+    const featureGroup = collectionGroup(firestore, 'listings');
+    const snapshot = await getCountFromServer(featureGroup);
+    const count = snapshot.data().count;
+    setCount(count);
+  };
   //   initialize the params
   const params = useParams();
   useEffect(() => {
@@ -33,6 +46,9 @@ const Category = () => {
         );
         // execte the query
         const querySnap = await getDocs(q);
+        // getting last item
+        const lastVisible = querySnap.docs[querySnap.docs.length - 1];
+        setLastFetchedListing(lastVisible);
         const listings = [];
         querySnap.forEach((doc) => {
           listings.push({
@@ -51,6 +67,40 @@ const Category = () => {
     // Calling the function
     fetchListing();
   }, [params.categoryName]);
+
+  // For loading more listings : Pagination
+
+  const onLoadMorefetchListing = async () => {
+    try {
+      //get a reference
+      const listingsRef = collection(db, 'listings');
+      // create a query
+      const q = query(
+        listingsRef,
+        where('type', '==', params.categoryName), //getting all the listing for request params means rent/sell
+        orderBy('timestamp', 'desc'), //ordering the data by timeStamp in decendening order.
+        // to get the item after previous items
+        startAfter(lastFetchedListing),
+        limit(2) //only give 10 per request
+      );
+      // execte the query
+      const querySnap = await getDocs(q);
+
+      const listings = [];
+      querySnap.forEach((doc) => {
+        listings.push({
+          id: doc.id, //id of the document
+          data: doc.data(), //data of the item
+        });
+      });
+      // setting this filtered value to the state variable
+      setListing((prevState) => [...prevState, ...listings]);
+      //make the loading dispear as we get the data
+      setLoading(false);
+    } catch (error) {
+      toast.error(`Couldn't fetch the listings`);
+    }
+  };
   return (
     <div className='category'>
       <header className='pageHeader'>
@@ -74,6 +124,11 @@ const Category = () => {
               })}
             </ul>
           </main>
+          {lastFetchedListing && listing.length < count && (
+            <p className='loadMore' onClick={onLoadMorefetchListing}>
+              Load More
+            </p>
+          )}
         </>
       ) : (
         <p>No listings for {params.categoryName}</p>

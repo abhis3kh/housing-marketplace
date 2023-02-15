@@ -2,15 +2,53 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { getAuth, updateProfile } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
-import { updateDoc, doc } from 'firebase/firestore';
+import ListingItem from '../components/ListingItem';
+import {
+  updateDoc,
+  doc,
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  deleteDoc,
+} from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
 import arrowRight from '../assets/svg/keyboardArrowRightIcon.svg';
 import homeIcon from '../assets/svg/homeIcon.svg';
+
 const Profile = () => {
   const auth = getAuth();
   const [changeDetails, setChangeDetails] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [listing, setListing] = useState(null);
+
+  useEffect(() => {
+    const fetchUserListing = async () => {
+      const listingRef = collection(db, 'listings');
+      const q = query(
+        listingRef,
+        where('userRef', '==', auth.currentUser.uid),
+        orderBy('timestamp', 'desc')
+      );
+      const qSnap = await getDocs(q);
+
+      const listing = [];
+      qSnap.forEach((doc) => {
+        return listing.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+      setListing(listing);
+      console.log(listing);
+      setLoading(false);
+    };
+    fetchUserListing();
+  }, [auth.currentUser.uid]);
+
   const [formData, setFormData] = useState({
     name: auth.currentUser.displayName,
     email: auth.currentUser.email,
@@ -47,6 +85,24 @@ const Profile = () => {
       [e.target.id]: e.target.value,
     }));
   };
+  // for deleting a item from the page
+  const onDelete = async (id, name) => {
+    console.log(`Request for Deleting the product : ${id} recieved. `);
+    if (window.confirm(`Are you sure that you want to delete ${name} ?`)) {
+      await deleteDoc(doc(db, 'listings', id));
+      //now updating the local data which we have to reflect the changes in UI
+      const updatedListing = listing.filter((list) => list.id !== id);
+      // update it to stateLevel
+      setListing(updatedListing);
+      // giving a pop saying success
+      toast.success(`Sucessfully deleted the ${name} from the listings.`);
+    }
+  };
+
+  // For editing an item
+
+  const onEdit = (listingId) => navigate(`/edit-listing/${listingId}`);
+
   return (
     <div className='profile'>
       <header className='profileHeader'>
@@ -96,6 +152,24 @@ const Profile = () => {
           <p>Sell or Rent your home</p>
           <img src={arrowRight} alt='CreateButton' />
         </Link>
+        {!loading && listing.length > 0 && (
+          <>
+            <p className='listingText'>Your Listings</p>
+            <ul className='listingsList'>
+              {listing.map((list) => {
+                return (
+                  <ListingItem
+                    key={list.id}
+                    listing={list.data}
+                    id={list.id}
+                    onDelete={() => onDelete(list.id, list.data.name)}
+                    onEdit={() => onEdit(list.id)}
+                  />
+                );
+              })}
+            </ul>
+          </>
+        )}
       </main>
     </div>
   );
