@@ -1,4 +1,4 @@
-# House Marketplace - One Stop Solution for selling and renting house/s.
+# Housing Marketplace - One Stop Solution for selling and renting house/s.
 
 Find and list houses for sale or rent.
 
